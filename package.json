@@ -52,6 +52,7 @@
   },
   "dependencies": {
     "@bsv/sdk": "^1.3.35",
-    "@bsv/wallet-toolbox": "^1.1.62"
+    "@bsv/wallet-toolbox": "^1.1.62",
+    "mysql2": "^3.12.0"
   }
 }

@@ -45,6 +45,7 @@ export async function backupToSQLite(
 
   await setup.storage.addWalletStorageProvider(backup)
 
+  await setup.storage.setActive('028f2daab7808b79368d99eef1ebc2d35cdafe3932cafe3d83cf17837af034ec29')
   await setup.storage.updateBackups()
 }
 

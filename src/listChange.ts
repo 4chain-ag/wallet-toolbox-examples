@@ -32,13 +32,15 @@ Change for:
       limit: 1000
     })
 
+    console.log(`${ar('sats', 10)} ${al('status', 10)} ${ar('vout', 3)} txid`)
+
     for (const stati of [['nosend'], ['completed', 'unproven']])
       for (const a of actions.reverse()) {
         if (stati.indexOf(a.status) >= 0) {
           for (const o of a.outputs!) {
             if (o.spendable && o.basket === 'default') {
               console.log(
-                `${ar(o.satoshis, 10)} ${al(a.status, 10)} ${ar(o.outputIndex, 3)} ${a.txid}`
+                `${ar(o.satoshis, 10)} ${al(a.status, 10)} ${ar(o.outputIndex, 3)} ${a.txid} `
               )
             }
           }

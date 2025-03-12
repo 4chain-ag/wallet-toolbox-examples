@@ -1,13 +1,10 @@
-import 'dotenv/config'
-import dotenv from 'dotenv'
-import {Services, Setup} from "@bsv/wallet-toolbox";
-import {InternalizeActionArgs, PrivateKey} from "@bsv/sdk";
+import { Services, Setup } from '@bsv/wallet-toolbox'
+import { InternalizeActionArgs, PrivateKey } from '@bsv/sdk'
 
 export async function faucetInternalize(txid: string) {
   // Setup
-  dotenv.config({path: `${__dirname}/.env`});
-  const derivationPrefix = 'SfKxPIJNgdI=';
-  const derivationSuffix = 'NaGLC6fMH50=';
+  const derivationPrefix = 'SfKxPIJNgdI='
+  const derivationSuffix = 'NaGLC6fMH50='
 
   const env = Setup.getEnv('test')
   const setup1 = await Setup.createWalletClient({ env })
@@ -42,4 +39,6 @@ export async function faucetInternalize(txid: string) {
   await setup1.storage.destroy()
 }
 
-faucetInternalize('e05596f6e225e47de402ad7a4d4040dadace40d89dae6f21178b3cd8a9255895').catch(console.log)
+faucetInternalize(
+  '72edeb04163375dcab28c3e81010a13b1f632e995e951c18ac3f2c51a438c12a'
+).catch(console.log)

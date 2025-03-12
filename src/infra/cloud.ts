@@ -11,7 +11,7 @@ import {
 import { Knex, knex as makeKnex } from 'knex'
 
 import * as dotenv from 'dotenv'
-dotenv.config()
+dotenv.config({path: `${__dirname}/.env`})
 
 // Load environment variables
 const {
@@ -55,7 +55,7 @@ async function setupWalletStorageAndMonitor(): Promise<{
 
     // You can also use an imported knex configuration file.
     const knexConfig: Knex.Config = {
-      client: 'mysql2',
+      client: connection['client'] || 'mysql2',
       connection,
       useNullAsDefault: true,
       pool: {

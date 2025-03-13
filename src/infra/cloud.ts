@@ -6,12 +6,16 @@ import {
   WalletStorageManager,
   WalletStorageServerOptions,
   StorageServer,
-  Wallet
+  Wallet,
+  Monitor,
+  MonitorDaemon,
+  MonitorStorage
 } from '@bsv/wallet-toolbox'
 import { Knex, knex as makeKnex } from 'knex'
 
 import * as dotenv from 'dotenv'
-dotenv.config({path: `${__dirname}/.env`})
+import { Chain } from '@bsv/wallet-toolbox/out/src/sdk'
+dotenv.config({ path: `${__dirname}/.env` })
 
 // Load environment variables
 const {
@@ -25,17 +29,7 @@ const {
   FEE_MODEL = '{"model":"sat/kb","value":1}'
 } = process.env
 
-async function setupWalletStorageAndMonitor(): Promise<{
-  databaseName: string
-  knex: Knex
-  activeStorage: StorageKnex
-  storage: WalletStorageManager
-  services: Services
-  settings: TableSettings
-  keyDeriver: bsv.KeyDeriver
-  wallet: Wallet
-  server: StorageServer
-}> {
+async function setupWalletStorageAndMonitor() {
   try {
     if (!SERVER_PRIVATE_KEY) {
       throw new Error('SERVER_PRIVATE_KEY must be set')
@@ -99,10 +93,21 @@ async function setupWalletStorageAndMonitor(): Promise<{
 
     // Initialize wallet components
     const servOpts = Services.createDefaultOptions(chain)
-    if (TAAL_API_KEY) servOpts.taalApiKey = TAAL_API_KEY
+    if (TAAL_API_KEY) {
+      servOpts.taalApiKey = TAAL_API_KEY
+    }
     const services = new Services(servOpts)
-    const keyDeriver = new bsv.KeyDeriver(rootKey)
-    const wallet = new Wallet({ chain, keyDeriver, storage, services })
+
+    // Initialize monitor
+    const monitor = await setupMonitor(chain, services, storage)
+
+    const wallet = new Wallet({
+      chain,
+      keyDeriver: new bsv.KeyDeriver(rootKey),
+      storage,
+      services,
+      monitor
+    })
 
     // Set up server options
     const serverOptions: WalletStorageServerOptions = {
@@ -122,7 +127,6 @@ async function setupWalletStorageAndMonitor(): Promise<{
       storage,
       services,
       settings,
-      keyDeriver,
       wallet,
       server
     }
@@ -130,6 +134,31 @@ async function setupWalletStorageAndMonitor(): Promise<{
     console.error('Error setting up Wallet Storage and Monitor:', error)
     throw error
   }
+}
+
+async function setupMonitor(
+  chain: Chain,
+  services: Services,
+  storage: MonitorStorage
+) {
+  const monitor = new Monitor({
+    chain,
+    services,
+    storage,
+    msecsWaitPerMerkleProofServiceReq: 500,
+    taskRunWaitMsecs: 5000,
+    abandonedMsecs: 1000 * 60 * 5,
+    unprovenAttemptsLimitTest: 10,
+    unprovenAttemptsLimitMain: 144,
+    chaintracks: services.options.chaintracks!
+  })
+  monitor.addDefaultTasks()
+
+  const daemon = new MonitorDaemon({ monitor })
+  await daemon.createSetup()
+  daemon.runDaemon().catch(console.error)
+
+  return monitor
 }
 
 // Main function to start the server

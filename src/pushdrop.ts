@@ -13,7 +13,8 @@ import {
   SetupWallet,
   wait
 } from '@bsv/wallet-toolbox'
-
+import dotenv from 'dotenv'
+dotenv.config({ path: `${__dirname}/.env` })
 /**
  * @param {WalletProtocol} protocolID - The protocol ID to use.
  * @param {string} keyID - The key ID to use.

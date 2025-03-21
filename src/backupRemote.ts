@@ -1,6 +1,7 @@
 import {sdk, Setup, SetupEnv, SetupWallet, StorageClient} from '@bsv/wallet-toolbox'
 import { runArgv2Function } from './runArgv2Function'
-
+import dotenv from 'dotenv'
+dotenv.config({ path: `${__dirname}/.env` })
 /**
  * @publicbody
  */

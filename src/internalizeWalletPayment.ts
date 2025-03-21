@@ -15,7 +15,8 @@ import {
 import { outputBRC29 } from './brc29'
 import { parseWalletOutpoint } from '@bsv/wallet-toolbox/out/src/sdk'
 import { runArgv2Function } from './runArgv2Function'
-
+import dotenv from 'dotenv'
+dotenv.config({ path: `${__dirname}/.env` })
 /**
  * Example of internalizing a BRC29 wallet payment output into a receiving wallet.
  *

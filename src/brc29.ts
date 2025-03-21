@@ -6,7 +6,8 @@ import {
   SetupWallet
 } from '@bsv/wallet-toolbox'
 import { runArgv2Function } from './runArgv2Function'
-
+import dotenv from 'dotenv'
+dotenv.config({ path: `${__dirname}/.env` })
 /**
  * Example of moving satoshis from one wallet to another using the BRC29 script template.
  *

@@ -6,7 +6,8 @@ import {
   WalletProtocol
 } from '@bsv/sdk'
 import { Setup } from '@bsv/wallet-toolbox'
-
+import dotenv from 'dotenv'
+dotenv.config({ path: `${__dirname}/.env` })
 class OpReturnTemplate implements ScriptTemplate {
   lock(data: string | string[]): LockingScript {
     const script: any[] = [{ op: OP.OP_FALSE }, { op: OP.OP_RETURN }]

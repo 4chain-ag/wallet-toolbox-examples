@@ -2,7 +2,8 @@ import { Beef } from '@bsv/sdk'
 import { Setup } from '@bsv/wallet-toolbox'
 import { inputBRC29 } from './brc29'
 import { runArgv2Function } from './runArgv2Function'
-
+import dotenv from 'dotenv'
+dotenv.config({ path: `${__dirname}/.env` })
 /**
  * Example receiving funding satoshis from an external BRC-100 wallet to your wallet to another using the BRC29 script template.
  *

@@ -1,6 +1,7 @@
 import { Services, Setup } from '@bsv/wallet-toolbox'
 import { InternalizeActionArgs, PrivateKey } from '@bsv/sdk'
-
+import dotenv from 'dotenv'
+dotenv.config({ path: `${__dirname}/.env` })
 export async function faucetInternalize(txid: string) {
   // Setup
   const derivationPrefix = 'SfKxPIJNgdI='

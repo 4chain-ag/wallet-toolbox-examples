@@ -12,7 +12,8 @@ import {
   Setup,
   SetupWallet
 } from '@bsv/wallet-toolbox'
-
+import dotenv from 'dotenv'
+dotenv.config({ path: `${__dirname}/.env` })
 /**
  * Example of internalizing a BRC29 wallet payment output into the receiving wallet.
  *

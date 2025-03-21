@@ -1,5 +1,6 @@
 import {brc29ProtocolID, Setup} from "@bsv/wallet-toolbox";
-
+import dotenv from 'dotenv'
+dotenv.config({ path: `${__dirname}/.env` })
 type Chain = 'main' | 'test'
 
 async function faucetAddress(network: Chain) {

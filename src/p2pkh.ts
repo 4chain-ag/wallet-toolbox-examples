@@ -1,6 +1,7 @@
 import { Beef, PrivateKey, PublicKey, SignActionArgs } from '@bsv/sdk'
 import { Setup, SetupWallet } from '@bsv/wallet-toolbox'
-
+import dotenv from 'dotenv'
+dotenv.config({ path: `${__dirname}/.env` })
 /**
  * Example of moving satoshis from one wallet to another using the P2PKH template
  * to send directly to the "address" associated with a private key.

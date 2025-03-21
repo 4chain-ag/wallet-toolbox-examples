@@ -2,7 +2,8 @@ import { Beef } from '@bsv/sdk'
 import { Setup } from '@bsv/wallet-toolbox'
 import { parseWalletOutpoint } from '@bsv/wallet-toolbox/out/src/sdk'
 import { runArgv2Function } from './runArgv2Function'
-
+import dotenv from 'dotenv'
+dotenv.config({ path: `${__dirname}/.env` })
 /**
  * Run this function using the following command:
  *

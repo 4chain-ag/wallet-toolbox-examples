@@ -1,7 +1,8 @@
 import { Setup } from '@bsv/wallet-toolbox'
 import { runArgv2Function } from './runArgv2Function'
 import { specOpWalletBalance } from '@bsv/wallet-toolbox/out/src/sdk'
-
+import dotenv from 'dotenv'
+dotenv.config({ path: `${__dirname}/.env` })
 /**
  * The `balance` function demonstrates creating a `ServerClient` based wallet and
  * calculating the wallet's "balance" as the sum of spendable outputs in the 'default' basket.

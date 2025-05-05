@@ -8,6 +8,8 @@ import {
 import { runArgv2Function } from './runArgv2Function'
 import dotenv from 'dotenv'
 dotenv.config({ path: `${__dirname}/.env` })
+import {inspect} from "node:util";
+
 /**
  * Example of moving satoshis from one wallet to another using the BRC29 script template.
  *
@@ -35,6 +37,8 @@ export async function brc29() {
 
   // create a new transaction with an output for setup2 in the amount of 42000 satoshis.
   const o = await outputBRC29(setup1, setup2.identityKey, 42000)
+
+  console.log(inspect(o, false, null, true))
 
   // use setup2 to consume the new output to demonstrate unlocking the output and adding it to the wallet's "change" outputs.
   await inputBRC29(setup2, o)

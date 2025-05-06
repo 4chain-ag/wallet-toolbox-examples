@@ -39,7 +39,7 @@ export async function faucetInternalize(network: Chain, txid: string) {
 
   const iwpr = await setup1.wallet.internalizeAction(args)
   console.log(JSON.stringify(iwpr))
-  await setup1.storage.destroy()
+  await storage.destroy()
 }
 
 faucetInternalize(

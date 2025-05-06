@@ -45,4 +45,4 @@ export async function faucetInternalize(network: Chain, txid: string) {
 faucetInternalize(
   'test',
   '06a4fd092ada6f916f0d8fdb001d5e647c832d108ac0068466ad9f6e82b3c30c'
-).then(() => process.exit(0)).catch(console.log)
+).then(() => process.exit(0)).catch(console.error)

@@ -41,6 +41,7 @@ Links: [API](#api), [Interfaces](#interfaces), [Functions](#functions)
 | --- |
 | [inputP2PKH](#function-inputp2pkh) |
 | [outputP2PKH](#function-outputp2pkh) |
+| [p2pkhToAddress](#function-p2pkhtoaddress) |
 | [transferP2PKH](#function-transferp2pkh) |
 
 Links: [API](#api), [Interfaces](#interfaces), [Functions](#functions)
@@ -214,6 +215,15 @@ Argument Details
 Note that the output uses the "address" associated with this public key: The HASH160 of the public key.
 + **satoshis**
   + How many satoshis to transfer to this new output.
+
+Links: [API](#api), [Interfaces](#interfaces), [Functions](#functions)
+
+---
+##### Function: p2pkhToAddress
+
+```ts
+export async function p2pkhToAddress() 
+```
 
 Links: [API](#api), [Interfaces](#interfaces), [Functions](#functions)
 

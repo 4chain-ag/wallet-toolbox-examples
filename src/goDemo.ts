@@ -14,7 +14,7 @@ export async function goDemo(network: sdk.Chain, txid: string) {
   }
 
   try {
-    await outputBRC29_SignableTransaction(network)
+    await outputBRC29(network)
   } catch (err) {
     console.error('Error in createAction:', err)
     return
@@ -23,7 +23,7 @@ export async function goDemo(network: sdk.Chain, txid: string) {
 
 goDemo(
   'test',
-  'e1f6f549d173531f5273e5e3e1ff4d5ac1985050068ea31dc8ee2d3b3a13b7e1'
+  'b0a88b8e68d5f33541e503849ebf817553b025566e2c77a3c3bd68b96d1cb35d'
 )
   .then(() => process.exit(0))
   .catch(console.error)
@@ -66,6 +66,63 @@ export async function faucetInternalize(network: sdk.Chain, txid: string) {
   console.log(JSON.stringify(iwpr))
   await storage.destroy()
 }
+
+export async function outputBRC29(
+  network: sdk.Chain,
+  satoshis: number = 1000
+) {
+  const env = Setup.getEnv(network)
+  const setup = await Setup.createWalletClient({ env })
+  const setup2 = await Setup.createWalletClient({
+    env,
+    rootKeyHex: env.devKeys[env.identityKey2]
+  })
+
+  const derivationPrefix = randomBytesBase64(8)
+  const derivationSuffix = randomBytesBase64(8)
+  const { keyDeriver } = setup
+
+  const t = new ScriptTemplateBRC29({
+    derivationPrefix,
+    derivationSuffix,
+    keyDeriver
+  })
+
+  // Use this label the new transaction can be found by `listActions` and as a "description" value.
+  const label = 'outputBRC29'
+
+  const result = await setup.wallet.createAction({
+    outputs: [
+      {
+        lockingScript: t
+          .lock(setup.rootKey.toString(), setup2.identityKey)
+          .toHex(),
+        satoshis,
+        outputDescription: label,
+        tags: ['relinquish'],
+        customInstructions: JSON.stringify({
+          derivationPrefix,
+          derivationSuffix,
+          type: 'BRC29'
+        })
+      }
+    ],
+    options: {
+      randomizeOutputs: false,
+      // This example prefers to immediately wait for the new transaction to be broadcast to the network.
+      // Typically, most production applications benefit from performance gains when broadcasts are handled in the background.
+      acceptDelayedBroadcast: false,
+
+      // false - processAction (broadcasting) is skipped - it means "signableTransaction"
+      signAndProcess: true
+    },
+    labels: [label],
+    description: label
+  })
+
+  console.log('createAction result', inspect(result, false, null, true))
+}
+
 
 export async function outputBRC29_SignableTransaction(
   network: sdk.Chain,

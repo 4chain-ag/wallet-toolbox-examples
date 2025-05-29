@@ -1,14 +1,12 @@
 import { Services, Setup } from '@bsv/wallet-toolbox'
 import { InternalizeActionArgs, PrivateKey } from '@bsv/sdk'
 import dotenv from 'dotenv'
+import { derivationParts } from './utils/derivation-prefix-suffix'
 dotenv.config({ path: `${__dirname}/.env` })
 type Chain = 'main' | 'test'
 
 export async function faucetInternalize(network: Chain, txid: string) {
   // Setup
-  const derivationPrefix = 'SfKxPIJNgdI='
-  const derivationSuffix = 'NaGLC6fMH50='
-
   const env = Setup.getEnv(network)
   const setup1 = await Setup.createWalletClient({ env })
 
@@ -21,17 +19,15 @@ export async function faucetInternalize(network: Chain, txid: string) {
 
   const beef = await storage.getBeefForTransaction(txid, {})
 
+  const {paymentRemittance} = derivationParts()
+
   const args: InternalizeActionArgs = {
     tx: beef.toBinaryAtomic(txid),
     outputs: [
       {
         outputIndex: 0,
         protocol: 'wallet payment',
-        paymentRemittance: {
-          derivationPrefix: derivationPrefix,
-          derivationSuffix: derivationSuffix,
-          senderIdentityKey: new PrivateKey(1).toPublicKey().toString()
-        }
+        paymentRemittance
       }
     ],
     description: 'from faucet top up'
@@ -44,5 +40,5 @@ export async function faucetInternalize(network: Chain, txid: string) {
 
 faucetInternalize(
   'test',
-  '06a4fd092ada6f916f0d8fdb001d5e647c832d108ac0068466ad9f6e82b3c30c'
+  '237163f5a05e3cce29c84a3360bc8c66e68bfb083d532c03f9bdfda9cf481052'
 ).then(() => process.exit(0)).catch(console.error)

@@ -1,7 +1,14 @@
 import dotenv from 'dotenv'
-import { randomBytesBase64, ScriptTemplateBRC29, sdk, Services, Setup } from '@bsv/wallet-toolbox'
+import {
+  randomBytesBase64,
+  ScriptTemplateBRC29,
+  sdk,
+  Services,
+  Setup
+} from '@bsv/wallet-toolbox'
 import { inspect } from 'node:util'
-import { InternalizeActionArgs, PrivateKey, Transaction } from '@bsv/sdk'
+import { InternalizeActionArgs, Transaction } from '@bsv/sdk'
+import { derivationParts } from './utils/derivation-prefix-suffix'
 
 dotenv.config({ path: `${__dirname}/.env` })
 
@@ -23,17 +30,13 @@ export async function goDemo(network: sdk.Chain, txid: string) {
 
 goDemo(
   'test',
-  'b0a88b8e68d5f33541e503849ebf817553b025566e2c77a3c3bd68b96d1cb35d'
+  '7563763442cc4118c45682f9db40a1756825b370801db4dfc46a1ee8f94c900e'
 )
   .then(() => process.exit(0))
   .catch(console.error)
 
-
 export async function faucetInternalize(network: sdk.Chain, txid: string) {
   // Setup
-  const derivationPrefix = 'SfKxPIJNgdI='
-  const derivationSuffix = 'NaGLC6fMH50='
-
   const env = Setup.getEnv(network)
   const setup1 = await Setup.createWalletClient({ env })
 
@@ -46,17 +49,15 @@ export async function faucetInternalize(network: sdk.Chain, txid: string) {
 
   const beef = await storage.getBeefForTransaction(txid, {})
 
+  const { paymentRemittance } = derivationParts()
+
   const args: InternalizeActionArgs = {
     tx: beef.toBinaryAtomic(txid),
     outputs: [
       {
         outputIndex: 0,
         protocol: 'wallet payment',
-        paymentRemittance: {
-          derivationPrefix: derivationPrefix,
-          derivationSuffix: derivationSuffix,
-          senderIdentityKey: new PrivateKey(1).toPublicKey().toString()
-        }
+        paymentRemittance
       }
     ],
     description: 'from faucet top up'
@@ -67,10 +68,7 @@ export async function faucetInternalize(network: sdk.Chain, txid: string) {
   await storage.destroy()
 }
 
-export async function outputBRC29(
-  network: sdk.Chain,
-  satoshis: number = 1000
-) {
+export async function outputBRC29(network: sdk.Chain, satoshis: number = 1000) {
   const env = Setup.getEnv(network)
   const setup = await Setup.createWalletClient({ env })
   const setup2 = await Setup.createWalletClient({
@@ -122,7 +120,6 @@ export async function outputBRC29(
 
   console.log('createAction result', inspect(result, false, null, true))
 }
-
 
 export async function outputBRC29_SignableTransaction(
   network: sdk.Chain,
@@ -182,8 +179,5 @@ export async function outputBRC29_SignableTransaction(
   const signableTransaction = Transaction.fromBEEF(
     result.signableTransaction?.tx!
   )
-  console.log(
-    'signable transaction',
-    signableTransaction
-  )
+  console.log('signable transaction', signableTransaction)
 }

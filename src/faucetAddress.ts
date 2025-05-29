@@ -1,5 +1,8 @@
+import { Utils } from "@bsv/sdk";
 import {brc29ProtocolID, Setup} from "@bsv/wallet-toolbox";
+
 import dotenv from 'dotenv'
+import { derivationParts } from './utils/derivation-prefix-suffix'
 dotenv.config({ path: `${__dirname}/.env` })
 type Chain = 'main' | 'test'
 
@@ -7,12 +10,10 @@ async function faucetAddress(network: Chain) {
   const env = Setup.getEnv(network)
   const setup = await Setup.createWalletClient({ env })
 
-  const derivationPrefix = 'SfKxPIJNgdI='
-  const derivationSuffix = 'NaGLC6fMH50='
-  const keyId = `${derivationPrefix} ${derivationSuffix}`
+  const {keyId, identityKey} = derivationParts()
 
   const address = setup.keyDeriver
-    .derivePrivateKey(brc29ProtocolID, keyId, 'anyone')
+    .derivePrivateKey(brc29ProtocolID, keyId, identityKey)
     .toAddress(`${network}net`)
 
   console.log('====================================')

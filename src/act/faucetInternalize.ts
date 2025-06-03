@@ -1,8 +1,13 @@
 import { derivationParts } from '../utils/derivation-prefix-suffix'
 import { sdk, Setup, Services } from '@bsv/wallet-toolbox'
-import { InternalizeActionArgs, PrivateKey } from '@bsv/sdk'
+import { InternalizeActionArgs, WalletPayment } from '@bsv/sdk'
 
-export async function faucetInternalize(network: sdk.Chain, txid: string) {
+export async function faucetInternalize(
+  network: sdk.Chain,
+  txid: string,
+  vout: number = 0,
+  paymentRemittance?: WalletPayment
+) {
   // Setup
   const env = Setup.getEnv(network)
   const setup1 = await Setup.createWalletClient({ env })
@@ -16,13 +21,15 @@ export async function faucetInternalize(network: sdk.Chain, txid: string) {
 
   const beef = await storage.getBeefForTransaction(txid, {})
 
-  const {paymentRemittance} = derivationParts()
+  if (paymentRemittance == undefined) {
+    paymentRemittance = derivationParts().paymentRemittance
+  }
 
   const args: InternalizeActionArgs = {
     tx: beef.toBinaryAtomic(txid),
     outputs: [
       {
-        outputIndex: 0,
+        outputIndex: vout,
         protocol: 'wallet payment',
         paymentRemittance
       }

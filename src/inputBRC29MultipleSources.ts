@@ -8,15 +8,39 @@ import {
 import { runArgv2Function } from './runArgv2Function'
 import { ScriptTemplateBRC29, sdk } from '@bsv/wallet-toolbox'
 import { getWallets } from './utils/get-wallets'
-import { Beef, KeyDeriver, P2PKH, SignActionArgs } from '@bsv/sdk'
+import {
+  Beef,
+  KeyDeriver,
+  P2PKH,
+  PrivateKey,
+  SignActionArgs,
+  WalletPayment
+} from '@bsv/sdk'
 import { SatoshiValue } from '@bsv/sdk/dist/esm/src/wallet'
+import dotenv from 'dotenv'
+dotenv.config({ path: `${__dirname}/.env` })
 
 export async function inputBRC29MultipleSources() {
   const network = 'test' // or 'main'
-  await faucetAddress(network)
+
+  let walletPayment: WalletPayment | undefined
+  // // uncomment to use a specific wallet payment
+  // walletPayment = {
+  //   derivationPrefix: '7wHf3zpabm5xtmls9ipreA==',
+  //   derivationSuffix: 'hL8Kz5zfAm8YBbp9zqFhEQ==',
+  //   // senderIdentityKey: new PrivateKey(1).toPublicKey().toString()
+  //   senderIdentityKey: (await getWallets(network).setup1).identityKey
+  // }
+
+  let vout = 0
+  // // uncomment to use specific txId and vout
+  // const txId = '5841ecd5c4f7f7695e910aab25e4c167c0f53017329e43e37c87fbc5579c7789'
+  // vout = 1
+
+  await faucetAddress(network, walletPayment)
   const txId = await userCouldProvideTransactionID()
   if (!!txId) {
-    await faucetInternalize(network, txId)
+    await faucetInternalize(network, txId, vout, walletPayment)
     console.log('Internalized transaction ID:', txId)
   }
 
@@ -46,7 +70,7 @@ async function createActionWithSeveralInputsAndOutputs(
   const outputLockingScript = new P2PKH().lock(
     keyDeriver.rootKey.toAddress(`${network}net`)
   )
-  const outputSatoshis: SatoshiValue = 200
+  const outputSatoshis: SatoshiValue = 50
 
   /**
    * Creating an action with an input that requires it's own signing template is a two step process.

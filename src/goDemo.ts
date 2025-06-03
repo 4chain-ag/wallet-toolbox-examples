@@ -3,13 +3,16 @@ import {
   randomBytesBase64,
   ScriptTemplateBRC29,
   sdk,
-  Services,
   Setup
 } from '@bsv/wallet-toolbox'
 import { inspect } from 'node:util'
-import { InternalizeActionArgs, Transaction } from '@bsv/sdk'
-import { derivationParts } from './utils/derivation-prefix-suffix'
-import { faucetAddress, faucetInternalize, outputBRC29, userCouldProvideTransactionID } from './act'
+import { Transaction } from '@bsv/sdk'
+import {
+  faucetAddress,
+  faucetInternalize,
+  outputBRC29,
+  userCouldProvideTransactionID
+} from './act'
 
 dotenv.config({ path: `${__dirname}/.env` })
 
@@ -32,7 +35,9 @@ export async function goDemo(network: sdk.Chain = 'test', txId?: string) {
   }
 }
 
-goDemo().then(() => process.exit(0)).catch(console.error)
+goDemo()
+  .then(() => process.exit(0))
+  .catch(console.error)
 
 export async function outputBRC29_SignableTransaction(
   network: sdk.Chain,

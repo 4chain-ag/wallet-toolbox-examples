@@ -1,11 +1,27 @@
-import { derivationParts } from '../utils/derivation-prefix-suffix'
+import { derivationParts, keyID } from '../utils/derivation-prefix-suffix'
 import { sdk, Setup, brc29ProtocolID } from '@bsv/wallet-toolbox'
+import { WalletPayment } from '@bsv/sdk'
 
-export async function faucetAddress(network: sdk.Chain) {
+export async function faucetAddress(
+  network: sdk.Chain,
+  paymentRemittance?: WalletPayment
+) {
   const env = Setup.getEnv(network)
   const setup = await Setup.createWalletClient({ env })
 
-  const {keyId, identityKey} = derivationParts()
+  let keyId: string
+  let identityKey: string
+  if (paymentRemittance) {
+    keyId = keyID(
+      paymentRemittance.derivationPrefix,
+      paymentRemittance.derivationSuffix
+    )
+    identityKey = paymentRemittance.senderIdentityKey
+  } else {
+    const parts = derivationParts()
+    keyId = parts.keyId
+    identityKey = parts.identityKey
+  }
 
   const address = setup.keyDeriver
     .derivePrivateKey(brc29ProtocolID, keyId, identityKey)

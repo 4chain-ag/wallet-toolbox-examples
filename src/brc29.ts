@@ -1,4 +1,9 @@
-import { Beef, SignActionArgs } from '@bsv/sdk'
+import {
+  Beef,
+
+  SignActionArgs,
+  Transaction
+} from '@bsv/sdk'
 import {
   randomBytesBase64,
   ScriptTemplateBRC29,
@@ -45,6 +50,64 @@ export async function brc29() {
   await inputBRC29(setup2, o)
 }
 
+export async function outputBRC29_SignableTransaction(
+  setup: SetupWallet,
+  toIdentityKey: string,
+  satoshis: number
+) {
+  const derivationPrefix = randomBytesBase64(8)
+  const derivationSuffix = randomBytesBase64(8)
+  const { keyDeriver } = setup
+
+  const t = new ScriptTemplateBRC29({
+    derivationPrefix,
+    derivationSuffix,
+    keyDeriver
+  })
+
+  // Use this label the new transaction can be found by `listActions` and as a "description" value.
+  const label = 'outputBRC29'
+
+  // This call to `createAction` will create a new funded transaction containing the new output,
+  // as well as sign and broadcast the transaction to the network.
+  const car = await setup.wallet.createAction({
+    outputs: [
+      // Explicitly specify the new output to be created.
+      // When outputs are explictly added to an action they must be funded:
+      // Typically, at least one "change" input will automatically be added to fund the transaction,
+      // and at least one output will be added to recapture excess funding.
+      {
+        lockingScript: t.lock(setup.rootKey.toString(), toIdentityKey).toHex(),
+        satoshis,
+        outputDescription: label,
+        tags: ['relinquish'],
+        customInstructions: JSON.stringify({
+          derivationPrefix,
+          derivationSuffix,
+          type: 'BRC29'
+        })
+      }
+    ],
+    options: {
+      // Turn off automatic output order randomization to avoid having to figure out which output is the explicit one.
+      // It will always be output zero.
+      randomizeOutputs: false, // TODO: Check why the output is not at the [0] index.
+      // This example prefers to immediately wait for the new transaction to be broadcast to the network.
+      // Typically, most production applications benefit from performance gains when broadcasts are handled in the background.
+      acceptDelayedBroadcast: false,
+
+      // false - processAction (broadcasting) is skipped - it means "signableTransaction"
+      signAndProcess: false //true by default
+    },
+    labels: [label],
+    description: label
+  })
+
+  console.log('car', car)
+
+  const signableTransaction = Transaction.fromBEEF(car.signableTransaction?.tx!)
+  console.log('signable transaction', signableTransaction)
+}
 /**
  * Create a new BRC29 output.
  *

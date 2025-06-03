@@ -1,8 +1,6 @@
 import { Setup } from '@bsv/wallet-toolbox'
-import { runArgv2Function } from './runArgv2Function'
-import { Chain, specOpWalletBalance } from '@bsv/wallet-toolbox/out/src/sdk'
+import { Chain } from '@bsv/wallet-toolbox/out/src/sdk'
 import dotenv from 'dotenv'
-import { faucetInternalize } from './faucetInternalize'
 dotenv.config({ path: `${__dirname}/.env` })
 
 async function relinquishOutput(network: Chain, txID: string, vout: number) {

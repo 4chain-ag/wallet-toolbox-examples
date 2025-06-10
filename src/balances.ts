@@ -1,8 +1,9 @@
+//IMPORTANT bypass must be first import
+import './bypass'
 import { Setup } from '@bsv/wallet-toolbox'
 import { runArgv2Function } from './runArgv2Function'
 import { specOpWalletBalance } from '@bsv/wallet-toolbox/out/src/sdk'
 import dotenv from 'dotenv'
-import { WalletOutput } from '@bsv/sdk/dist/esm/src/wallet'
 dotenv.config({ path: `${__dirname}/.env` })
 /**
  * The `balance` function demonstrates creating a `ServerClient` based wallet and

@@ -1,6 +1,8 @@
 import { derivationParts } from '../utils/derivation-prefix-suffix'
 import { sdk, Setup, Services } from '@bsv/wallet-toolbox'
 import { InternalizeActionArgs, WalletPayment } from '@bsv/sdk'
+import { Beef } from '@bsv/sdk'
+import { wocAPIGetBeefForTX } from './woc-api-get-beef-for-tx'
 
 export async function faucetInternalize(
   network: sdk.Chain,
@@ -12,14 +14,22 @@ export async function faucetInternalize(
   const env = Setup.getEnv(network)
   const setup1 = await Setup.createWalletClient({ env })
 
-  const storage = await Setup.createStorageKnex({
-    knex: Setup.createSQLiteKnex('getbeef.sqlite'),
-    databaseName: 'getbeef',
-    env
-  })
-  storage.setServices(new Services(env.chain))
+  let beef: Beef
+  try {
+    beef = await wocAPIGetBeefForTX(network, txid)
+  } catch (e) {
+    console.warn("failed to get beef directly from woc API, falling back to storage")
+    const storage = await Setup.createStorageKnex({
+      knex: Setup.createSQLiteKnex('getbeef.sqlite'),
+      databaseName: 'getbeef',
+      env
+    })
+    storage.setServices(new Services(env.chain))
 
-  const beef = await storage.getBeefForTransaction(txid, {})
+    beef = await storage.getBeefForTransaction(txid, {})
+
+    await storage.destroy()
+  }
 
   if (paymentRemittance == undefined) {
     paymentRemittance = derivationParts().paymentRemittance
@@ -37,7 +47,14 @@ export async function faucetInternalize(
     description: 'from faucet top up'
   }
 
+  console.log("===================== Internalizing Action =====================")
+  const tempArgs = {
+    ...args,
+    tx: beef.toHex()
+  }
+  console.log(JSON.stringify(tempArgs, null, 2))
+  console.log("=================================================================")
+
   const iwpr = await setup1.wallet.internalizeAction(args)
   console.log(JSON.stringify(iwpr))
-  await storage.destroy()
 }

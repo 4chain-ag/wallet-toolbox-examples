@@ -5,7 +5,7 @@ import { WalletPayment } from '@bsv/sdk'
 export async function faucetAddress(
   network: sdk.Chain,
   paymentRemittance?: WalletPayment
-) {
+): Promise<string> {
   const env = Setup.getEnv(network)
   const setup = await Setup.createWalletClient({ env })
 
@@ -36,4 +36,6 @@ export async function faucetAddress(
   console.info('You can use one of those testnet faucets:')
   console.info('https://scrypt.io/faucet')
   console.info('https://witnessonchain.com/faucet/tbsv')
+
+  return address.toString()
 }

@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wallet Toolbox API Tester</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .endpoints-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+        }
+
+        .endpoint-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .endpoint-card:hover {
+            box-shadow: 0 12px 35px rgba(0,0,0,0.2);
+        }
+
+        .endpoint-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .method-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.8rem;
+            margin-right: 15px;
+        }
+
+        .method-get {
+            background: #e8f5e8;
+            color: #2d5a2d;
+        }
+
+        .method-post {
+            background: #e8f2ff;
+            color: #1e3a8a;
+        }
+
+        .endpoint-title {
+            font-size: 1.3rem;
+            color: #1f2937;
+            font-weight: 600;
+        }
+
+        .endpoint-path {
+            color: #6b7280;
+            font-family: 'Courier New', monospace;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        .input-label {
+            display: block;
+            margin-bottom: 5px;
+            color: #374151;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 10px 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            font-size: 1rem;
+        }
+
+        .btn:hover {
+            background: linear-gradient(135deg, #2563eb, #1e40af);
+            transform: translateY(-1px);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .response-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .response-label {
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 10px;
+        }
+
+        .response-content {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 12px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+            color: #1f2937;
+        }
+
+        .loading {
+            color: #3b82f6;
+            font-style: italic;
+        }
+
+        .success {
+            border-left: 4px solid #10b981;
+            background: #f0fdfa;
+        }
+
+        .error {
+            border-left: 4px solid #ef4444;
+            background: #fef2f2;
+        }
+
+        .description {
+            color: #6b7280;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+            line-height: 1.4;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Wallet Toolbox API Tester</h1>
+        </div>
+
+        <div class="endpoints-grid">
+            <!-- Status Endpoint -->
+            <div class="endpoint-card">
+                <div class="endpoint-header">
+                    <span class="method-badge method-get">GET</span>
+                    <span class="endpoint-title">Status</span>
+                </div>
+                <div class="endpoint-path">/api/status</div>
+                <div class="description">Check the current status of the wallet service</div>
+                <button type="button" class="btn" onclick="callEndpoint('status', 'GET', '/api/status')">
+                    Test Status
+                </button>
+                <div class="response-section">
+                    <div class="response-label">Response:</div>
+                    <div id="status-response" class="response-content">Click "Test Status" to see response</div>
+                </div>
+            </div>
+
+            <!-- Keys Endpoint -->
+            <div class="endpoint-card">
+                <div class="endpoint-header">
+                    <span class="method-badge method-get">GET</span>
+                    <span class="endpoint-title">Keys</span>
+                </div>
+                <div class="endpoint-path">/api/keys</div>
+                <div class="description">Retrieve wallet keys for both users</div>
+                <button type="button" class="btn" onclick="callEndpoint('keys', 'GET', '/api/keys')">
+                    Get Keys
+                </button>
+                <div class="response-section">
+                    <div class="response-label">Response:</div>
+                    <div id="keys-response" class="response-content">Click "Get Keys" to see response</div>
+                </div>
+            </div>
+
+            <!-- Balance Endpoint -->
+            <div class="endpoint-card">
+                <div class="endpoint-header">
+                    <span class="method-badge method-get">GET</span>
+                    <span class="endpoint-title">Balance</span>
+                </div>
+                <div class="endpoint-path">/api/balance</div>
+                <div class="description">Check wallet balance for both users</div>
+                <button type="button" class="btn" onclick="callEndpoint('balance', 'GET', '/api/balance')">
+                    Get Balance
+                </button>
+                <div class="response-section">
+                    <div class="response-label">Response:</div>
+                    <div id="balance-response" class="response-content">Click "Get Balance" to see response</div>
+                </div>
+            </div>
+
+            <!-- Outputs Endpoint -->
+            <div class="endpoint-card">
+                <div class="endpoint-header">
+                    <span class="method-badge method-post">POST</span>
+                    <span class="endpoint-title">Get Outputs</span>
+                </div>
+                <div class="endpoint-path">/api/outputs</div>
+                <div class="description">Retrieve spendable outputs for a specific identity key</div>
+                
+                <div class="input-group">
+                    <label class="input-label" for="outputs-identityKey">Identity Key</label>
+                    <input type="text" id="outputs-identityKey" class="input-field" 
+                           placeholder="e.g., 020c0ca23c75f7312bad0c5d81bff858bdcf468d3ad69a60b46ae90cafef557b03">
+                </div>
+                
+                <button type="button" class="btn" onclick="getOutputs(event)">
+                    Get Outputs
+                </button>
+                <div class="response-section">
+                    <div class="response-label">Response:</div>
+                    <div id="outputs-response" class="response-content">Enter identity key and click "Get Outputs"</div>
+                </div>
+            </div>
+
+            <!-- Actions Endpoint -->
+            <div class="endpoint-card">
+                <div class="endpoint-header">
+                    <span class="method-badge method-post">POST</span>
+                    <span class="endpoint-title">Get Actions</span>
+                </div>
+                <div class="endpoint-path">/api/actions</div>
+                <div class="description">Retrieve wallet actions for a specific identity key</div>
+                
+                <div class="input-group">
+                    <label class="input-label" for="actions-identityKey">Identity Key</label>
+                    <input type="text" id="actions-identityKey" class="input-field" 
+                           placeholder="e.g., 020c0ca23c75f7312bad0c5d81bff858bdcf468d3ad69a60b46ae90cafef557b03">
+                </div>
+                
+                <button type="button" class="btn" onclick="getActions(event)">
+                    Get Actions
+                </button>
+                <div class="response-section">
+                    <div class="response-label">Response:</div>
+                    <div id="actions-response" class="response-content">Enter identity key and click "Get Actions"</div>
+                </div>
+            </div>
+
+            <!-- Delete Output Endpoint -->
+            <div class="endpoint-card">
+                <div class="endpoint-header">
+                    <span class="method-badge method-post">POST</span>
+                    <span class="endpoint-title">Delete Output</span>
+                </div>
+                <div class="endpoint-path">/api/deleteOutput</div>
+                <div class="description">Relinquish/delete a specific output from the wallet</div>
+                
+                <div class="input-group">
+                    <label class="input-label" for="deleteOutput-txID">Transaction ID</label>
+                    <input type="text" id="deleteOutput-txID" class="input-field" 
+                           placeholder="e.g., cf2cdd88269f9449fc6cc6117d06533beb1213e6b06b83c47d32e55bf6aac92b">
+                </div>
+                
+                <div class="input-group">
+                    <label class="input-label" for="deleteOutput-vout">VOUT</label>
+                    <input type="number" id="deleteOutput-vout" class="input-field" value="0" min="0">
+                </div>
+                
+                <div class="input-group">
+                    <label class="input-label" for="deleteOutput-identityKey">Identity Key</label>
+                    <input type="text" id="deleteOutput-identityKey" class="input-field" 
+                           placeholder="e.g., 020c0ca23c75f7312bad0c5d81bff858bdcf468d3ad69a60b46ae90cafef557b03">
+                </div>
+                
+                <button type="button" class="btn" onclick="deleteOutput(event)">
+                    Delete Output
+                </button>
+                <div class="response-section">
+                    <div class="response-label">Response:</div>
+                    <div id="deleteOutput-response" class="response-content">Fill in the form and click "Delete Output"</div>
+                </div>
+            </div>
+
+            <!-- Internalize Endpoint -->
+            <div class="endpoint-card">
+                <div class="endpoint-header">
+                    <span class="method-badge method-post">POST</span>
+                    <span class="endpoint-title">Internalize Transaction</span>
+                </div>
+                <div class="endpoint-path">/api/internalize</div>
+                <div class="description">Internalize a transaction with transaction ID and identity key</div>
+                
+                <div class="input-group">
+                    <label class="input-label" for="internalize-txid">Transaction ID</label>
+                    <input type="text" id="internalize-txid" class="input-field" 
+                           placeholder="e.g., cf2cdd88269f9449fc6cc6117d06533beb1213e6b06b83c47d32e55bf6aac92b">
+                </div>
+                
+                <div class="input-group">
+                    <label class="input-label" for="internalize-identityKey">Identity Key</label>
+                    <input type="text" id="internalize-identityKey" class="input-field" 
+                           placeholder="e.g., 020c0ca23c75f7312bad0c5d81bff858bdcf468d3ad69a60b46ae90cafef557b03">
+                </div>
+                
+                <div class="input-group">
+                    <label class="input-label" for="internalize-vout">VOUT (optional)</label>
+                    <input type="number" id="internalize-vout" class="input-field" value="0" min="0">
+                </div>
+                
+                <div class="input-group">
+                    <label class="input-label" for="internalize-beef">BEEF (optional)</label>
+                    <input type="text" id="internalize-beef" class="input-field" 
+                           placeholder="e.g., Binary Encoded Exchange Format data">
+                </div>
+                
+                <button type="button" class="btn" onclick="internalizeTransaction(event)">
+                    Internalize Transaction
+                </button>
+                <div class="response-section">
+                    <div class="response-label">Response:</div>
+                    <div id="internalize-response" class="response-content">Fill in the form and click "Internalize Transaction"</div>
+                </div>
+            </div>
+
+            <!-- OP_RETURN Endpoint -->
+            <div class="endpoint-card">
+                <div class="endpoint-header">
+                    <span class="method-badge method-post">POST</span>
+                    <span class="endpoint-title">OP_RETURN Transaction</span>
+                </div>
+                <div class="endpoint-path">/api/opreturn</div>
+                <div class="description">Create an OP_RETURN transaction with custom text data</div>
+                
+                <div class="input-group">
+                    <label class="input-label" for="opreturn-text">Text Data</label>
+                    <input type="text" id="opreturn-text" class="input-field" 
+                           placeholder="e.g., Hello, BSV world!" value="Hello, world 123!">
+                </div>
+                
+                <button type="button" class="btn" onclick="opReturnTransaction(); return false;">
+                    Create OP_RETURN
+                </button>
+                <div class="response-section">
+                    <div class="response-label">Response:</div>
+                    <div id="opreturn-response" class="response-content">Enter text and click "Create OP_RETURN"</div>
+                </div>
+            </div>
+
+            <!-- Faucet Endpoint -->
+            <div class="endpoint-card">
+                <div class="endpoint-header">
+                    <span class="method-badge method-post">POST</span>
+                    <span class="endpoint-title">Faucet Transaction</span>
+                </div>
+                <div class="endpoint-path">/api/faucet</div>
+                <div class="description">Create a P2PKH transaction to specified addresses</div>
+                
+                <div class="input-group">
+                    <label class="input-label" for="faucet-key">Key</label>
+                    <input type="text" id="faucet-key" class="input-field" 
+                           value="4chain" placeholder="Authentication key">
+                </div>
+                
+                <div class="input-group">
+                    <label class="input-label" for="faucet-address">Address</label>
+                    <input type="text" id="faucet-address" class="input-field" 
+                           placeholder="e.g., 1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa">
+                </div>
+                
+                <div class="input-group">
+                    <label class="input-label" for="faucet-satoshis">Satoshis</label>
+                    <input type="number" id="faucet-satoshis" class="input-field" 
+                           value="1" min="1" placeholder="Amount in satoshis">
+                </div>
+                
+                <button type="button" class="btn" onclick="faucetTransaction(event)">
+                    Create Faucet Transaction
+                </button>
+                <div class="response-section">
+                    <div class="response-label">Response:</div>
+                    <div id="faucet-response" class="response-content">Fill in the form and click "Create Faucet Transaction"</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:3000';
+
+        // Even more aggressive error handling to prevent dev server reload
+        window.onerror = function(message, source, lineno, colno, error) {
+            console.error('Window error caught:', { message, source, lineno, colno, error });
+            return true; // Prevent the error from being thrown
+        };
+
+        window.addEventListener('error', function(event) {
+            console.error('Error event caught:', event.error);
+            event.preventDefault();
+            event.stopPropagation();
+            return true;
+        }, true);
+
+        window.addEventListener('unhandledrejection', function(event) {
+            console.error('Unhandled promise rejection:', event.reason);
+            event.preventDefault();
+            event.stopPropagation();
+            return true;
+        }, true);
+
+        // Suppress all console errors that might trigger dev server reload
+        const originalError = console.error;
+        console.error = function(...args) {
+            // Still log to console but don't let it bubble up
+            originalError.apply(console, args);
+        };
+
+        async function callEndpoint(endpointName, method, path, body = null) {
+            const responseElement = document.getElementById(`${endpointName}-response`);
+            
+            try {
+                responseElement.textContent = 'Loading...';
+                responseElement.className = 'response-content loading';
+
+                console.log(`Calling ${method} ${API_BASE_URL}${path}`);
+                if (body) {
+                    console.log('Request body:', body);
+                }
+
+                const options = {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                };
+
+                if (body) {
+                    options.body = JSON.stringify(body);
+                }
+
+                const response = await fetch(`${API_BASE_URL}${path}`, options);
+                console.log('Response status:', response.status);
+                console.log('Response ok:', response.ok);
+                
+                let data;
+                try {
+                    data = await response.json();
+                    console.log('Response data:', data);
+                } catch (parseError) {
+                    console.error('Failed to parse JSON response:', parseError);
+                    responseElement.textContent = `Error: Failed to parse response as JSON. Status: ${response.status}`;
+                    responseElement.className = 'response-content error';
+                    return;
+                }
+
+                responseElement.textContent = JSON.stringify(data, null, 2);
+                responseElement.className = response.ok ? 'response-content success' : 'response-content error';
+            } catch (error) {
+                console.error('Network error:', error);
+                responseElement.textContent = `Network Error: ${error.message}\n\nPlease check:\n1. Server is running on ${API_BASE_URL}\n2. CORS is properly configured\n3. Network connectivity`;
+                responseElement.className = 'response-content error';
+            }
+        }
+
+        async function internalizeTransaction(event) {
+            try {
+                event.preventDefault();
+                const txid = document.getElementById('internalize-txid').value.trim();
+                const identityKey = document.getElementById('internalize-identityKey').value.trim();
+                const vout = parseInt(document.getElementById('internalize-vout').value) || 0;
+                const beef = document.getElementById('internalize-beef').value.trim();
+
+                if (!txid || !identityKey) {
+                    alert('Please fill in both Transaction ID and Identity Key');
+                    return;
+                }
+
+                const body = {
+                    txid: txid,
+                    identityKey: identityKey,
+                    vout: vout
+                };
+
+                // Only include beef if it has a value
+                if (beef) {
+                    body.beef = beef;
+                }
+
+                await callEndpoint('internalize', 'POST', '/api/internalize', body);
+            } catch (error) {
+                console.error('Error in internalizeTransaction:', error);
+            }
+        }
+
+        async function opReturnTransaction() {
+            try {
+                console.log('OP_RETURN transaction initiated');
+                const text = document.getElementById('opreturn-text').value.trim();
+
+                if (!text) {
+                    alert('Please enter some text for the OP_RETURN transaction');
+                    return false;
+                }
+
+                console.log('OP_RETURN text:', text);
+
+                const body = {
+                    text: text
+                };
+
+                await callEndpoint('opreturn', 'POST', '/api/opreturn', body);
+                return false;
+            } catch (error) {
+                console.error('Error in opReturnTransaction:', error);
+                return false;
+            }
+        }
+
+        async function faucetTransaction(event) {
+            try {
+                event.preventDefault();
+                const key = document.getElementById('faucet-key').value.trim();
+                const address = document.getElementById('faucet-address').value.trim();
+                const satoshis = parseInt(document.getElementById('faucet-satoshis').value);
+
+                if (!key) {
+                    alert('Please enter the authentication key');
+                    return;
+                }
+
+                if (!address) {
+                    alert('Please enter a valid address');
+                    return;
+                }
+
+                if (!satoshis || satoshis <= 0) {
+                    alert('Please enter a positive amount of satoshis');
+                    return;
+                }
+
+                const body = {
+                    key: key,
+                    outputs: [
+                        {
+                            address: address,
+                            satoshis: satoshis
+                        }
+                    ]
+                };
+
+                await callEndpoint('faucet', 'POST', '/api/faucet', body);
+            } catch (error) {
+                console.error('Error in faucetTransaction:', error);
+            }
+        }
+
+        async function getOutputs(event) {
+            try {
+                event.preventDefault();
+                const identityKey = document.getElementById('outputs-identityKey').value.trim();
+
+                if (!identityKey) {
+                    alert('Please enter an identity key');
+                    return;
+                }
+
+                const body = {
+                    identityKey: identityKey
+                };
+
+                await callEndpoint('outputs', 'POST', '/api/outputs', body);
+            } catch (error) {
+                console.error('Error in getOutputs:', error);
+            }
+        }
+
+        async function getActions(event) {
+            try {
+                event.preventDefault();
+                const identityKey = document.getElementById('actions-identityKey').value.trim();
+
+                if (!identityKey) {
+                    alert('Please enter an identity key');
+                    return;
+                }
+
+                const body = {
+                    identityKey: identityKey
+                };
+
+                await callEndpoint('actions', 'POST', '/api/actions', body);
+            } catch (error) {
+                console.error('Error in getActions:', error);
+            }
+        }
+
+        async function deleteOutput(event) {
+            try {
+                event.preventDefault();
+                const txID = document.getElementById('deleteOutput-txID').value.trim();
+                const vout = parseInt(document.getElementById('deleteOutput-vout').value) || 0;
+                const identityKey = document.getElementById('deleteOutput-identityKey').value.trim();
+
+                if (!txID || !identityKey) {
+                    alert('Please fill in both Transaction ID and Identity Key');
+                    return;
+                }
+
+                const body = {
+                    txID: txID,
+                    vout: vout,
+                    identityKey: identityKey
+                };
+
+                await callEndpoint('deleteOutput', 'POST', '/api/deleteOutput', body);
+            } catch (error) {
+                console.error('Error in deleteOutput:', error);
+            }
+        }
+    </script>
+</body>
+</html> 

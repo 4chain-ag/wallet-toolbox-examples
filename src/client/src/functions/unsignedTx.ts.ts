@@ -6,12 +6,12 @@ import { getLockingScriptHexFromAddress } from "./keys";
 import dotenv from "dotenv";
 dotenv.config({ path: `${__dirname}/.env` });
 
-export async function faucet(outputs: { address: string; satoshis: number }[]) {
+
+export async function createUnsignedTx(outputs: { address: string; satoshis: number }[]) {
   const user1Setup = await getUser1Setup();
-  return await createP2pkhTx(user1Setup, outputs);
+  return await createUnsignedP2pkhTx(user1Setup, outputs);
 }
-//Create a p2pkh transaction
-export async function createP2pkhTx(
+export async function createUnsignedP2pkhTx(
   setup: SetupWallet,
   outputs: { address: string; satoshis: number }[]
 ) {
@@ -27,11 +27,16 @@ export async function createP2pkhTx(
     options: {
       randomizeOutputs: false,
       acceptDelayedBroadcast: false,
+      signAndProcess: false
+
     },
     labels: [label],
     description: label,
   });
 
+  // If this is unsigned we will require the params to sign it, which should be provided in the result?
+  //TODO: we need to return the required params to sign the transaction inputs (payment remmitance instructions etc)
+  console.log(car)
   const beef = Transaction.fromAtomicBEEF(car.tx!).toHexBEEF();
-  return { beef, txid : car.txid, vout : 0 };
+  return { beef };
 }

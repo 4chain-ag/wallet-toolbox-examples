@@ -433,6 +433,99 @@
                     <div id="faucet-response" class="response-content">Fill in the form and click "Create Faucet Transaction"</div>
                 </div>
             </div>
+
+            <!-- Signature Endpoint -->
+            <div class="endpoint-card">
+                <div class="endpoint-header">
+                    <span class="method-badge method-post">POST</span>
+                    <span class="endpoint-title">Create Signature</span>
+                </div>
+                <div class="endpoint-path">/api/signature</div>
+                <div class="description">Create a signature for a message using the wallet's identity key</div>
+                <div class="input-group">
+                    <label class="input-label" for="signature-identityKey">Identity Key:</label>
+                    <input type="text" id="signature-identityKey" class="input-field" 
+                           placeholder="e.g., 020c0ca23c75f7312bad0c5d81bff858bdcf468d3ad69a60b46ae90cafef557b03">
+                </div>
+                <div class="input-group">
+                    <label class="input-label" for="signature-message">Message:</label>
+                    <input type="text" id="signature-message" class="input-field" placeholder="Enter message to sign">
+                </div>
+                <button type="button" class="btn" onclick="callSignatureEndpoint()">
+                    Create Signature
+                </button>
+                <div class="response-section">
+                    <div class="response-label">Response:</div>
+                    <div id="signature-response" class="response-content">Click "Create Signature" to see response</div>
+                </div>
+            </div>
+
+            <!-- Verify Signature Endpoint -->
+            <div class="endpoint-card">
+                <div class="endpoint-header">
+                    <span class="method-badge method-post">POST</span>
+                    <span class="endpoint-title">Verify Signature</span>
+                </div>
+                <div class="endpoint-path">/api/verifySignature</div>
+                <div class="description">Verify a signature against a message and identity key</div>
+                <div class="input-group">
+                    <label class="input-label" for="verify-identity-key">Identity Key:</label>
+                    <input type="text" id="verify-identity-key" class="input-field" placeholder="Enter identity key">
+                </div>
+                <div class="input-group">
+                    <label class="input-label" for="verify-message">Message:</label>
+                    <input type="text" id="verify-message" class="input-field" placeholder="Enter message">
+                </div>
+                <div class="input-group">
+                    <label class="input-label" for="verify-signature">Signature:</label>
+                    <input type="text" id="verify-signature" class="input-field" placeholder="Enter signature (base64)">
+                </div>
+                <div class="input-group">
+                    <label class="input-label" for="verify-key-id">Key ID (optional):</label>
+                    <input type="text" id="verify-key-id" class="input-field" placeholder="Enter key ID">
+                </div>
+                <div class="input-group">
+                    <label class="input-label" for="verify-protocol-id">Protocol ID (optional):</label>
+                    <input type="text" id="verify-protocol-id" class="input-field" placeholder="Enter protocol ID (e.g., [2,'signature'])">
+                </div>
+                <button type="button" class="btn" onclick="callVerifySignatureEndpoint()">
+                    Verify Signature
+                </button>
+                <div class="response-section">
+                    <div class="response-label">Response:</div>
+                    <div id="verify-signature-response" class="response-content">Click "Verify Signature" to see response</div>
+                </div>
+            </div>
+
+            <!-- Sweep Endpoint -->
+            <div class="endpoint-card">
+                <div class="endpoint-header">
+                    <span class="method-badge method-post">POST</span>
+                    <span class="endpoint-title">Sweep Funds</span>
+                </div>
+                <div class="endpoint-path">/api/sweep</div>
+                <div class="description">Sweep all funds from one wallet to another</div>
+                
+                <div class="input-group">
+                    <label class="input-label" for="sweep-sendingIdentityKey">Sending Identity Key</label>
+                    <input type="text" id="sweep-sendingIdentityKey" class="input-field" 
+                           placeholder="e.g., 020c0ca23c75f7312bad0c5d81bff858bdcf468d3ad69a60b46ae90cafef557b03">
+                </div>
+                
+                <div class="input-group">
+                    <label class="input-label" for="sweep-receivingIdentityKey">Receiving Identity Key</label>
+                    <input type="text" id="sweep-receivingIdentityKey" class="input-field" 
+                           placeholder="e.g., 020c0ca23c75f7312bad0c5d81bff858bdcf468d3ad69a60b46ae90cafef557b03">
+                </div>
+                
+                <button type="button" class="btn" onclick="callSweepEndpoint()">
+                    Sweep Funds
+                </button>
+                <div class="response-section">
+                    <div class="response-label">Response:</div>
+                    <div id="sweep-response" class="response-content">Click "Sweep Funds" to see response</div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -666,6 +759,103 @@
                 await callEndpoint('deleteOutput', 'POST', '/api/deleteOutput', body);
             } catch (error) {
                 console.error('Error in deleteOutput:', error);
+            }
+        }
+
+        async function callSignatureEndpoint() {
+            try {
+                const identityKey = document.getElementById('signature-identityKey').value.trim();
+                const message = document.getElementById('signature-message').value.trim();
+
+                if (!identityKey || !message) {
+                    alert('Please fill in both Identity Key and Message');
+                    return;
+                }
+
+                const body = {
+                    identityKey: identityKey,
+                    message: message
+                };
+
+                await callEndpoint('signature', 'POST', '/api/signature', body);
+            } catch (error) {
+                console.error('Error in callSignatureEndpoint:', error);
+            }
+        }
+
+        async function callVerifySignatureEndpoint() {
+            try {
+                const identityKey = document.getElementById('verify-identity-key').value.trim();
+                const message = document.getElementById('verify-message').value.trim();
+                const signature = document.getElementById('verify-signature').value.trim();
+                const keyID = document.getElementById('verify-key-id').value.trim();
+                const protocolIDStr = document.getElementById('verify-protocol-id').value.trim();
+
+                if (!identityKey || !message || !signature) {
+                    alert('Please fill in all required fields');
+                    return;
+                }
+
+                const body = {
+                    identityKey: identityKey,
+                    message: message,
+                    signature: signature
+                };
+
+                // Add optional fields if provided
+                if (keyID) {
+                    body.keyID = keyID;
+                }
+                if (protocolIDStr) {
+                    try {
+                        body.protocolID = JSON.parse(protocolIDStr);
+                    } catch (e) {
+                        alert('Invalid Protocol ID format. Please use format: [2,"signature"]');
+                        return;
+                    }
+                }
+
+                const responseElement = document.getElementById('verify-signature-response');
+                responseElement.textContent = 'Loading...';
+                responseElement.className = 'response-content loading';
+
+                const response = await fetch(`${API_BASE_URL}/api/verifySignature`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(body)
+                });
+
+                const data = await response.json();
+                responseElement.textContent = JSON.stringify(data, null, 2);
+                responseElement.className = response.ok ? 'response-content success' : 'response-content error';
+            } catch (error) {
+                console.error('Error in callVerifySignatureEndpoint:', error);
+                const responseElement = document.getElementById('verify-signature-response');
+                responseElement.textContent = `Error: ${error.message}`;
+                responseElement.className = 'response-content error';
+            }
+        }
+
+        async function callSweepEndpoint() {
+            try {
+                const sendingIdentityKey = document.getElementById('sweep-sendingIdentityKey').value.trim();
+                const receivingIdentityKey = document.getElementById('sweep-receivingIdentityKey').value.trim();
+
+                if (!sendingIdentityKey || !receivingIdentityKey) {
+                    alert('Please fill in both Sending Identity Key and Receiving Identity Key');
+                    return;
+                }
+
+                const body = {
+                    sendingIdentityKey: sendingIdentityKey,
+                    receivingIdentityKey: receivingIdentityKey
+                };
+
+                await callEndpoint('sweep', 'POST', '/api/sweep', body);
+            } catch (error) {
+                console.error('Error in callSweepEndpoint:', error);
             }
         }
     </script>

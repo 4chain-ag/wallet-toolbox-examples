@@ -8,6 +8,9 @@ import opreturnRoutes from './opreturn'
 import outputsRoutes from './outputs'
 import actionsRoutes from './actions'
 import deleteOutputRoutes from './deleteOutput'
+import signatureRoutes from './signature'
+import verifySignatureRoutes from './verifySignature'
+import sweepRoutes from './sweep'
 
 const router = Router()
 
@@ -21,5 +24,8 @@ router.use('/api', opreturnRoutes)
 router.use('/api', outputsRoutes)
 router.use('/api', actionsRoutes)
 router.use('/api', deleteOutputRoutes)
+router.use('/api', signatureRoutes)
+router.use('/api', verifySignatureRoutes)
+router.use('/api', sweepRoutes)
 
 export default router

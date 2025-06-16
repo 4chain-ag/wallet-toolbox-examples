@@ -4,8 +4,8 @@ const oldPrefix = 'SfKxPIJNgdI='
 const oldSuffix = 'NaGLC6fMH50='
 
 export function derivationParts() {
-  const prefix = 'anystringyouwanttochangetheaddress2' // set this to any string you want to change the address
-  const suffix = 'anystringyouwanttochangetheaddress2' // set this to any string you want to change the address
+  const prefix = 'someString' // set this to any string you want to change the address
+  const suffix = 'someString' // set this to any string you want to change the address
 
   const bytes = derivationBytes(prefix, suffix)
 

@@ -6,16 +6,22 @@ import { getLockingScriptHexFromAddress } from "./keys";
 import dotenv from "dotenv";
 dotenv.config({ path: `${__dirname}/.env` });
 
-export async function faucet(outputs: { address: string; satoshis: number }[]) {
+export async function multiInputTxHandler(outputs: { address: string; satoshis: number }[], inputs: {beef: string, txid: string, vout: number}[]) {
   const user1Setup = await getUser1Setup();
-  return await createP2pkhTx(user1Setup, outputs);
+  
+  return await multiInputTx(user1Setup, outputs, inputs);
 }
 //Create a p2pkh transaction
-export async function createP2pkhTx(
+export async function multiInputTx(
   setup: SetupWallet,
-  outputs: { address: string; satoshis: number }[]
+  outputs: { address: string; satoshis: number }[],
+  inputs: {beef: string, txid: string, vout: number}[]
 ) {
-  const label = "outputP2PKH";
+
+
+    //TODO: We will add in the inputs here directly to the trasnaction from the beef
+    // need to check validation, signing, paymentRemittance, etc.
+  const label = "multiInputSourceTx";
   const car = await setup.wallet.createAction({
     outputs: outputs.map((output) => ({
       lockingScript: getLockingScriptHexFromAddress(output.address),

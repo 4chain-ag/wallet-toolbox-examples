@@ -6,7 +6,8 @@ const originalSha256 = Hash.sha256
 Hash.sha256 = (msg: number[] | string, enc?: 'hex' | 'utf8') => {
   if (Array.isArray(msg) && isGoCompatibilityMode()) {
     // Convert array of numbers to a string
-    msg = msg.map(it => it < 0 ? 256 + it : it);
+    msg = msg.map(it => it === -1 ? 0 : it);
+    msg.forEach(it => { if (it < 0) throw new Error("Negative number in byte array") });
   }
   return originalSha256(msg, enc)
 }
